@@ -29,7 +29,7 @@ with st.sidebar:
     st.markdown("""
     <div style='text-align: left; font-size: 0.9em; margin-bottom: 1rem;'>
         Created by <a href='https://github.com/piotr-daniel' target='_blank'>Piotr Daniel</a> <br>
-        <a href='https://github.com/piotr-daniel/nibblepy-api' target='_blank'>GitHub Repo</a> |
+        <a href='https://github.com/NibblePy/nibblepy-app' target='_blank'>GitHub Repo</a> |
         <a href='https://github.com/NibblePy/nibblepy-api' target='_blank'>NibblePy API</a>
     </div>
     """, unsafe_allow_html=True)
