@@ -27,6 +27,15 @@ query = st.sidebar.text_input("🔍 Search snippets by keyword:", placeholder="'
 with st.sidebar:
     st.divider()
     st.markdown("""
+    <div style='text-align: justify; font-size: 0.9em; margin-bottom: 1rem;'>
+        <b>NibblePy</b> is a Streamlit-based web app that lets learners discover Python fundamentals through 
+        small, well-explained code examples. Specifically designed for the 'doers' who often struggle with the pure 
+        theory and often need something practical that produces instant results. The snippets are easy to digest and 
+        analyse which helps to understand what's happening under the hood.
+    </div>
+    """, unsafe_allow_html=True)
+    st.divider()
+    st.markdown("""
     <div style='text-align: left; font-size: 0.9em; margin-bottom: 1rem;'>
         Created by <a href='https://github.com/piotr-daniel' target='_blank'>Piotr Daniel</a> <br>
         <a href='https://github.com/NibblePy/nibblepy-app' target='_blank'>GitHub Repo</a> |
