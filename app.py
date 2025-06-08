@@ -12,9 +12,11 @@ try:
     response = requests.get(API_URL)
     response.raise_for_status()
     snippets = response.json()  # Expecting a list of snippet dicts
+    snippets = snippets["results"]
 except Exception:
     st.error("Failed to fetch snippets from the API.")
     st.stop()
+
 
 # Sidebar filters
 categories = sorted({snip.get("category") or "Uncategorized" for snip in snippets})
@@ -70,4 +72,5 @@ for snippet in filtered_snippets:
     st.code(snippet.get("code", ""), language="python")
     st.markdown(f"**Explanation:** {snippet.get('explanation', 'No explanation provided.')}")
     st.markdown(f"**Difficulty:** `{snippet.get('difficulty', 'Unknown').capitalize()}`")
+    st.markdown(f"**Category:** `{snippet.get('category', 'Unknown')}`")
     st.divider()
