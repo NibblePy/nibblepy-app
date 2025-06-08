@@ -8,30 +8,29 @@ st.set_page_config(page_title="NibblePy", page_icon="🐍")
 st.title("NibblePy – Learn Python One Snippet at a Time", anchor=False)
 
 # Fetch data
-# noinspection PyBroadException
 try:
     response = requests.get(API_URL)
     response.raise_for_status()
-    snippets = response.json()
-except Exception as e:
+    snippets = response.json()  # Expecting a list of snippet dicts
+except Exception:
     st.error("Failed to fetch snippets from the API.")
     st.stop()
 
 # Sidebar filters
-categories = sorted(set(s.get("category", "Uncategorized") for s in snippets.values()))
-difficulties = sorted(set(s["difficulty"] for s in snippets.values()))
+categories = sorted({snip.get("category") or "Uncategorized" for snip in snippets})
+difficulties = sorted({snip.get("difficulty") or "Unknown" for snip in snippets})
 
 selected_category = st.sidebar.selectbox("📂 Filter by Category", ["All"] + categories)
 selected_difficulty = st.sidebar.selectbox("🎯 Filter by Difficulty", ["All"] + difficulties, index=1)
 query = st.sidebar.text_input("🔍 Search snippets by keyword:", placeholder="'list' or 'class'")
+
 with st.sidebar:
     st.divider()
     st.markdown("""
     <div style='text-align: justify; font-size: 0.9em; margin-bottom: 1rem;'>
         <b>NibblePy</b> is a Streamlit-based web app that lets learners discover Python fundamentals through 
-        small, well-explained code examples. Specifically designed for the 'doers' who often struggle with the pure 
-        theory and often need something practical that produces instant results. The snippets are easy to digest and 
-        analyse which helps to understand what's happening under the hood.
+        small, well-explained code examples. Designed for the 'doers' who need practical, bite-sized code snippets
+        that produce instant results.
     </div>
     """, unsafe_allow_html=True)
     st.divider()
@@ -44,41 +43,31 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 
-# Filter snippets
 def matches(snippet):
-    if selected_category != "All" and snippet.get("category") != selected_category:
+    if selected_category != "All" and (snippet.get("category") or "Uncategorized") != selected_category:
         return False
-    if selected_difficulty != "All" and snippet["difficulty"] != selected_difficulty:
+    if selected_difficulty != "All" and (snippet.get("difficulty") or "Unknown") != selected_difficulty:
         return False
     if query:
         q = query.lower()
         return (
-                q in snippet["title"].lower()
-                or q in snippet["explanation"].lower()
-                or q in snippet["code"].lower()
-                or any(q in rel.lower() for rel in snippet.get("related", []))
+            q in snippet.get("title", "").lower()
+            or q in snippet.get("explanation", "").lower()
+            or q in snippet.get("code", "").lower()
         )
     return True
 
 
-# Filtered results
-filtered_snippets = [snippet for snippet in snippets.values() if matches(snippet)]
+filtered_snippets = [snip for snip in snippets if matches(snip)]
 
-# Display result count and snippets
-if len(filtered_snippets) > 0:
+if filtered_snippets:
     st.info(f"Showing **{len(filtered_snippets)}** snippet(s) matching your filters")
-elif len(filtered_snippets) == 0:
-    st.warning(f"**None** of the snippets has matched your filters")
 else:
-    st.error(f"An error has occurred, please reset the filter and try again")
+    st.warning("**None** of the snippets matched your filters")
 
-if snippets:
-    for key, snippet in snippets.items():
-        if matches(snippet):
-            st.subheader(snippet["title"])
-            st.code(snippet["code"], language="python")
-            st.markdown(f"**Explanation:** {snippet['explanation']}")
-            st.markdown(f"**Difficulty:** `{snippet['difficulty'].capitalize()}`")
-            if snippet.get("related"):
-                st.markdown(f"**Related:** `{', '.join(snippet['related'])}`")
-            st.divider()
+for snippet in filtered_snippets:
+    st.subheader(snippet.get("title", "Untitled"))
+    st.code(snippet.get("code", ""), language="python")
+    st.markdown(f"**Explanation:** {snippet.get('explanation', 'No explanation provided.')}")
+    st.markdown(f"**Difficulty:** `{snippet.get('difficulty', 'Unknown').capitalize()}`")
+    st.divider()
